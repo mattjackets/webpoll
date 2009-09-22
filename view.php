@@ -32,14 +32,24 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 # THE POSSIBILITY OF SUCH DAMAGE.
 ###############################################################################
-echo("<hr/><a href=\"".$_SERVER['PHP_SELF']."?new\">Create a new poll</a><hr/>");
+
 include('config.php');
 if (! $db)
 {
   echo("<p>Database error.</p>");
   exit();
 }
-$qpolls = mysql_query("SELECT * FROM polls");
+$pollquery = "SELECT * FROM polls";
+if (isset($_GET["id"]))
+{
+  if (!is_numeric($_GET["id"]))
+  {
+    echo("<p>fale</p>");
+    exit();
+  }
+  $pollquery = $pollquery." WHERE id=".$_GET["id"];
+}
+$qpolls=mysql_query($pollquery);
 if (!$qpolls)
 {
   echo("<p>Database errors.</p>");
@@ -48,8 +58,11 @@ if (!$qpolls)
 echo("<ul>");
 while ($row = mysql_fetch_array($qpolls))
 {
-  echo("<li>".$row["title"]."</li>");
-  $pollanswers = mysql_query("SELECT * FROM answers WHERE poll_id=".$row["id"]." ORDER BY id");  echo("<ol>");
+  echo("<li>".$row["title"]);
+  if ($_GET["q"] == 1)
+    echo(": <b>".$row["question"]."</b>");
+  echo("</li>");
+  $pollanswers = mysql_query("SELECT * FROM answers WHERE poll_id=".$row["id"]." ORDER BY votes");  echo("<ol>");
   if (!$pollanswers)
   {
     echo("<p>Database errors.</p>");
@@ -62,53 +75,6 @@ while ($row = mysql_fetch_array($qpolls))
   echo("</ol>");
 }
 echo("</ul>");
-if (isset($_GET['new']))
-{
-?>
-  <form method="post" action="<? echo $_SERVER['PHP_SELF']; ?>">
-    Poll title: <input type="text" size="25" maxlength="128" name="t" /><br/>
-    Poll question:</br> <textarea rows="10" cols="26" maxlength="256" name="q" ></textarea><br/>
-    <input type="submit" value="create poll" name="create" />
-  </form>
-<?
-}
-if (isset($_POST['create']))
-{
-  $t=$_POST['t'];
-  $q=$_POST['q'];
-
-  $query = "INSERT INTO polls SET title='$t',question='$q'";
-  if(! mysql_query($query))
-  {
-    echo("<p>Database error.</p>");
-    exit();
-  }
-  $pid=mysql_insert_id();
-  echo("<p>Poll added. id=$pid</p>");
-}
-if (isset($_POST['answer']))
-{
-  $a=$_POST['a'];
-  $pid=$_POST['pid'];
-  $query = "INSERT INTO answers SET poll_id='$pid',answer='$a'";
-  if(! mysql_query($query))
-  {
-    echo("<p>Database error.</p>");
-    exit();
-  }
-  echo("<p>Answer added to poll.</p>");
-}
-if (isset($_POST['answer']) || isset($_POST['create']))
-{
-?>
-  <form method="post" action="<? echo $_SERVER['PHP_SELF']; ?>">
-    Answer: <input type="text" size="25" maxlength="128" name="a" /><br/>
-    <input type="hidden" name="pid" value="<? echo $pid; ?>" />
-    <input type="submit" value="add answer" name="answer" />
-    <input type="submit" value="done" name="done" />
-  </form>
-<?
-}
 ?>
 </body>
 </html>
