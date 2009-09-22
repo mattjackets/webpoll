@@ -32,6 +32,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 # THE POSSIBILITY OF SUCH DAMAGE.
 ###############################################################################
+
 echo("<hr/><a href=\"".$_SERVER['PHP_SELF']."?new\">Create a new poll</a><hr/>");
 include('config.php');
 if (! $db)
@@ -39,29 +40,8 @@ if (! $db)
   echo("<p>Database error.</p>");
   exit();
 }
-$qpolls = mysql_query("SELECT * FROM polls");
-if (!$qpolls)
-{
-  echo("<p>Database errors.</p>");
-  exit();
-}
-echo("<ul>");
-while ($row = mysql_fetch_array($qpolls))
-{
-  echo("<li>".$row["title"]."</li>");
-  $pollanswers = mysql_query("SELECT * FROM answers WHERE poll_id=".$row["id"]." ORDER BY id");  echo("<ol>");
-  if (!$pollanswers)
-  {
-    echo("<p>Database errors.</p>");
-    exit();
-  }
-  while ($arow = mysql_fetch_array($pollanswers))
-  {
-    echo("<li>".$arow["answer"]." - ".$arow["votes"]." votes</li>");
-  }
-  echo("</ol>");
-}
-echo("</ul>");
+$links=$q=1;
+include('view.partial');
 if (isset($_GET['new']))
 {
 ?>

@@ -1,5 +1,3 @@
-<html>
-<body>
 <?php
 ###############################################################################
 # Copyright (c) 2009, Matthew F. Coates
@@ -33,24 +31,43 @@
 # THE POSSIBILITY OF SUCH DAMAGE.
 ###############################################################################
 
-include('config.php');
 if (! $db)
 {
   echo("<p>Database error.</p>");
   exit();
 }
-$id="";
-$q=$_GET["q"];
-if (isset($_GET["id"]))
+$pollquery = "SELECT * FROM polls";
+if (!empty($id))
 {
-  if (!is_numeric($_GET["id"]))
+  $pollquery = $pollquery." WHERE id=".$id;
+}
+$qpolls=mysql_query($pollquery);
+if (!$qpolls)
+{
+  echo("<p>Database errors.</p>");
+  exit();
+}
+echo("<ul>");
+while ($row = mysql_fetch_array($qpolls))
+{
+  echo("<li>".$row["title"]);
+  if ($q == 1)
+    echo(": <b>".$row["question"]."</b>");
+  if ($links == 1)
+    echo(" <a href=\"admin.php?id=".$row["id"]."&edit=1\">edit</a>");
+  echo("</li>");
+  $pollanswers = mysql_query("SELECT * FROM answers WHERE poll_id=".$row["id"]." ORDER BY votes");
+  echo("<ol>");
+  if (!$pollanswers)
   {
-    echo("<p>fale</p>");
+    echo("<p>Database error.</p>");
     exit();
   }
-  $id = $_GET["id"];
+  while ($arow = mysql_fetch_array($pollanswers))
+  {
+    echo("<li>".$arow["answer"]." - ".$arow["votes"]." votes</li>");
+  }
+  echo("</ol>");
 }
-include('view.partial');
+echo("</ul>");
 ?>
-</body>
-</html>
