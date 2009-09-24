@@ -1,11 +1,4 @@
 <html>
-<head>
-<style>
-.pbox{width:250px;border:1px solid #000;height:23px;}
-.pbar{white-space:nowrap;background:#ddf;height:20px;color:#005;text-align:right;padding:3px 0px 0px 0px;}
-
-</style>
-</head>
 <body>
 <?php
 ###############################################################################
@@ -47,7 +40,6 @@ if (! $db)
   exit();
 }
 $id="";
-$q=$_GET["q"];
 if (isset($_GET["id"]))
 {
   if (!is_numeric($_GET["id"]))
@@ -57,7 +49,22 @@ if (isset($_GET["id"]))
   }
   $id = $_GET["id"];
 }
-include('view.partial');
+else
+  exit();
+if (! $db)
+{
+  echo("<p>Database error.</p>");
+  exit();
+}
+$pollquery = "UPDATE answers SET votes = votes+1 WHERE id=".$id;
+$qpolls=mysql_query($pollquery);
+if (!$qpolls)
+{
+  echo("<p>Database errors.</p>");
+  exit();
+}
+else
+  echo("<p>Thank you for voting.");
 ?>
 </body>
 </html>

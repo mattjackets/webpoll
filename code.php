@@ -66,8 +66,8 @@ if (!$qpolls)
 $code="";
 while ($row = mysql_fetch_array($qpolls))
 {
-  $code.="<h3 class=\"pollq\">".$row["question"]."</h3><ul>";
-  $pollanswers = mysql_query("SELECT * FROM answers WHERE poll_id=".$row["id"]);
+  $code.="<h3 class=\"pollq\">".$row["question"]."</h3>\n<ul>";
+  $pollanswers = mysql_query("SELECT * FROM answers WHERE poll_id=".$row["id"]." ORDER BY id");
   if (!$pollanswers)
   {
     echo("<p>Database error.</p>");
@@ -75,9 +75,9 @@ while ($row = mysql_fetch_array($qpolls))
   }
   while ($arow = mysql_fetch_array($pollanswers))
   {
-    $code.="<li class=\"polla\"><a href=\"".$baseurl."vote.php?id=".$id."&a=".$arow["id"]."\">".$arow["answer"]."</a></li>";
+    $code.="\n<li class=\"polla\">\n  <a href=\"".$baseurl."vote.php?id=".$arow["id"]."\">".$arow["answer"]."</a>\n</li>";
   }
-  $code.="</ul>";
+  $code.="\n</ul>";
 }
 ?>
 <textarea rows="20" cols="50"><?php echo $code; ?></textarea>

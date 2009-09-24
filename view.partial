@@ -54,19 +54,30 @@ while ($row = mysql_fetch_array($qpolls))
   if ($q == 1)
     echo(": <b>".$row["question"]."</b>");
   if ($links == 1)
-    echo(" <a href=\"admin.php?id=".$row["id"]."&edit=1\">edit</a>");
+    echo("\n <a href=\"admin.php?id=".$row["id"]."&edit=1\">edit</a>");
   echo("</li>");
-  $pollanswers = mysql_query("SELECT * FROM answers WHERE poll_id=".$row["id"]." ORDER BY votes");
+  $pollanswers = mysql_query("SELECT * FROM answers WHERE poll_id=".$row["id"]." ORDER BY id");
   echo("<ol>");
   if (!$pollanswers)
   {
     echo("<p>Database error.</p>");
     exit();
   }
+  $answers = array();
+  $total = 0;
   while ($arow = mysql_fetch_array($pollanswers))
   {
-    echo("<li>".$arow["answer"]." - ".$arow["votes"]." votes</li>");
+    $answers[]=$arow;
+    $total+=$arow["votes"];
   }
+  foreach($answers as $arow)
+  {
+    $percent=0;
+    if ($total > 0)
+      $percent=round(($arow["votes"]/$total)*100);
+    echo("\n<li>".$arow["answer"]." <div class='pbox'><div class='pbar' style='width:".$percent."%;'>".$arow["votes"]." votes, ".$percent."%</div></div></li>");
+  }
+
   echo("</ol>");
 }
 echo("</ul>");
