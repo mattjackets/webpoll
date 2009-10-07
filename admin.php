@@ -40,8 +40,7 @@ if (! $db)
   echo("<p>Database error.</p>");
   exit();
 }
-$links=$q=1;
-include('view.partial');
+$pid=0;
 if (isset($_GET['new']))
 {
 ?>
@@ -52,7 +51,7 @@ if (isset($_GET['new']))
   </form>
 <?
 }
-if (isset($_POST['create']))
+else if (isset($_POST['create']))
 {
   $t=$_POST['t'];
   $q=$_POST['q'];
@@ -63,20 +62,27 @@ if (isset($_POST['create']))
     echo("<p>Database error.</p>");
     exit();
   }
-  $pid=mysql_insert_id();
-  echo("<p>Poll added. id=$pid</p>");
+  $id=$pid=mysql_insert_id();
+  include('view.partial');
+  echo("<p>Poll created, please add responces below.</p>");
 }
-if (isset($_POST['answer']))
+else if (isset($_POST['answer']))
 {
   $a=$_POST['a'];
-  $pid=$_POST['pid'];
+  $pid=$id=$_POST['pid'];
   $query = "INSERT INTO answers SET poll_id='$pid',answer='$a'";
   if(! mysql_query($query))
   {
     echo("<p>Database error.</p>");
     exit();
   }
+  include('view.partial');
   echo("<p>Answer added to poll.</p>");
+}
+else
+{
+  $links=$q=1;
+  include('view.partial');
 }
 if (isset($_POST['answer']) || isset($_POST['create']))
 {

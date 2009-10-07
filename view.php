@@ -40,13 +40,8 @@
 # THE POSSIBILITY OF SUCH DAMAGE.
 ###############################################################################
 
-include('config.php');
-if (! $db)
-{
-  echo("<p>Database error.</p>");
-  exit();
-}
-$id="";
+#include('config.php');
+include('view.partial');
 $q=$_GET["q"];
 if (isset($_GET["id"]))
 {
@@ -56,8 +51,10 @@ if (isset($_GET["id"]))
     exit();
   }
   $id = $_GET["id"];
+  showpoll($id,1);
 }
-include('view.partial');
+else
+  showpolls();
 ?>
 </body>
 </html>
