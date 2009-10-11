@@ -1,4 +1,11 @@
 <html>
+<head>
+<style>
+.pbox{width:250px;border:1px solid #000;height:23px;}
+.pbar{white-space:nowrap;background:#ddf;height:20px;color:#005;text-align:right;padding:3px 0px 0px 0px;}
+
+</style>
+</head>
 <body>
 <?php
 ###############################################################################
@@ -33,8 +40,31 @@
 # THE POSSIBILITY OF SUCH DAMAGE.
 ###############################################################################
 
-echo("<hr/><a href=\"".$_SERVER['PHP_SELF']."?new\">Create a new poll</a><hr/>");
+function answerform($pid)
+{
+?>
+  <form method="post" action="<? echo $_SERVER['PHP_SELF']; ?>">
+    Add a new answer: <input type="text" size="25" maxlength="128" name="a" /><br/>
+    <input type="hidden" name="pid" value="<? echo $pid; ?>" />
+    <input type="submit" value="add answer" name="answer" />
+  </form>
+<?
+}
+function stdview($pid)
+{
+  $view = new View();
+  $view->setid($pid);
+  $view->showquestion();
+  $view->showdel();
+  $view->show();
+  answerform($pid);
+  echo("<hr/><b>HTML for email:</b><br/>");
+  $view->code();
+}
+echo("<hr/><a href=\"".$_SERVER['PHP_SELF']."?new\">Create a new poll</a>");
+echo(" <a href=\"".$_SERVER['PHP_SELF']."\">List all polls</a><hr/>");
 include('config.php');
+include('view.php');
 if (! $db)
 {
   echo("<p>Database error.</p>");
@@ -63,38 +93,76 @@ else if (isset($_POST['create']))
     exit();
   }
   $id=$pid=mysql_insert_id();
-  include('view.partial');
   echo("<p>Poll created, please add responces below.</p>");
+  stdview($pid);
 }
 else if (isset($_POST['answer']))
 {
   $a=$_POST['a'];
-  $pid=$id=$_POST['pid'];
+  $pid=$_POST['pid'];
   $query = "INSERT INTO answers SET poll_id='$pid',answer='$a'";
   if(! mysql_query($query))
   {
     echo("<p>Database error.</p>");
     exit();
   }
-  include('view.partial');
   echo("<p>Answer added to poll.</p>");
+  stdview($pid);
+}
+else if (isset($_GET['edit']))
+{
+  $pid=$_GET['id'];
+  stdview($pid);
+}
+else if (isset($_POST['deleteanswer']))
+{
+  $pid=$_POST['pid'];
+  $aid=$_POST['aid'];
+  $query = "DELETE FROM answers WHERE id='$aid'";
+  if(! mysql_query($query))
+  {
+    echo("<p>Error deleting answer</p>");
+    exit();
+  }
+  echo("<p>Answer deleted from poll</p>");
+  stdview($pid);
+}
+else if (isset($_POST['deletepoll']))
+{
+  $pid=$_POST['id'];
+  $query = "DELETE FROM answers WHERE poll_id='$pid'";
+  if(! mysql_query($query))
+  {
+    echo("<p>Error deleting answers from poll.  Poll not deleted.</p>");
+    exit();
+  }
+  $query = "DELETE FROM polls WHERE id='$pid'";
+  if(! mysql_query($query))
+  {
+    echo("<p>Error deleting poll</p>");
+    exit();
+  }
+  echo("<p>Poll deleted</p>");
+  $view = new View();
+  $view->showquestion();
+  $view->showlinks();
+  $view->show();
+}
+else if (isset($_GET['results']))
+{
+  $view = new View();
+  $view->setid($_GET["id"]);
+  $view->showresults();
+  $view->show();
 }
 else
 {
-  $links=$q=1;
-  include('view.partial');
+  $view = new View();
+  $view->showquestion();
+  $view->showlinks();
+  $view->show();
 }
-if (isset($_POST['answer']) || isset($_POST['create']))
-{
-?>
-  <form method="post" action="<? echo $_SERVER['PHP_SELF']; ?>">
-    Answer: <input type="text" size="25" maxlength="128" name="a" /><br/>
-    <input type="hidden" name="pid" value="<? echo $pid; ?>" />
-    <input type="submit" value="add answer" name="answer" />
-    <input type="submit" value="done" name="done" />
-  </form>
-<?
-}
+
 ?>
 </body>
 </html>
