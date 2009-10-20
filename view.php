@@ -155,15 +155,17 @@ class View
     $code="";
     while ($row = mysql_fetch_array($qpolls))
     {
-      $code.="<h3 class=\"pollq\">".$row["question"]."</h3>\n<ul>";
+      $code.="<table id=\"textEdit\" class=\"PollBG\" border=\"0\" cellpadding=\"10\" cellspacing=\"0\" width=\"100%\">\n <tbody>\n  <tr>\n   <td style=\"color: rgb(55, 90, 158); font-family: Arial,Helvetica,sans-serif; font-size: 10pt;\" styleclass=\"style_PollText\" rowspan=\"1\" colspan=\"1\" align=\"left\">";
+      $code.="\n    <h3 style=\"color: rgb(55, 90, 158); font-family: Arial,Helvetica,sans-serif; font-size: 14pt;\" styleclass=\"style_pollq\">".$row["question"]."</h3>\n    <ul>";
       $pollanswers = mysql_query("SELECT * FROM answers WHERE poll_id=".$row["id"]." ORDER BY id");
       if (!$pollanswers)
 	exit();
       while ($arow = mysql_fetch_array($pollanswers))
       {
-	$code.="\n<li class=\"polla\">\n  <a href=\"".$this->baseurl."vote.php?id=".$arow["id"]."\">".$arow["answer"]."</a>\n</li>";
+        $code.="\n     <li style=\"color: rgb(55, 90, 158); font-family: Arial,Helvetica,sans-serif; font-size: 10pt;\" styleclass=\"style_polla\">";
+        $code.="\n      <a href=\"".$this->baseurl."vote.php?id=".$arow["id"]."\">".$arow["answer"]."</a>\n     </li>";
       }
-      $code.="\n</ul>";
+      $code.="\n    </ul>\n   </td>\n  </tr>\n </tbody>\n</table>";
     }
     echo("<textarea rows='20' cols='50'>$code</textarea>");
   }
