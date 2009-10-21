@@ -1,4 +1,16 @@
+<?php
+$cookie = $_COOKIE["ssldcpoll".$_GET["pid"]];
+if ($cookie != "voted")
+{
+  setcookie("ssldcpoll".$_GET["pid"], "voted", time()+31536000);
+}
+?>
 <html>
+<style>
+.pbox{width:250px;border:1px solid #000;height:23px;}
+.pbar{white-space:nowrap;background:#ddf;height:20px;color:#005;text-align:right;padding:3px 0px 0px 0px;}
+
+</style>
 <body>
 <?php
 ###############################################################################
@@ -39,6 +51,7 @@ if (! $db)
   echo("<p>Database error.</p>");
   exit();
 }
+include('view.php');
 $id="";
 if (isset($_GET["id"]))
 {
@@ -57,14 +70,26 @@ if (! $db)
   exit();
 }
 $pollquery = "UPDATE answers SET votes = votes+1 WHERE id=".$id;
-$qpolls=mysql_query($pollquery);
-if (!$qpolls)
+if ($cookie != "voted")
 {
-  echo("<p>Database errors.</p>");
-  exit();
+  $qpolls=mysql_query($pollquery);
+  if (!$qpolls)
+  {
+    echo("<p>Database errors.</p>");
+    exit();
+  }
+  else
+  {
+    echo("<p>Thank you for voting.</p>");
+  }
 }
-else
-  echo("<p>Thank you for voting.");
+$view = new View();
+$view->setid($_GET["pid"]);
+$view->showresults();
+$view->showquestion();
+$view->hidetitle();
+$view->show();
 ?>
+<a href="http://southsidepgh.com">Click here to visit the South Side home page.</a>
 </body>
 </html>

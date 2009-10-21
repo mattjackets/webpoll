@@ -40,6 +40,7 @@ class View
   private $question = false;
   private $id = -1;
   private $del = false;
+  private $title = true;
   public function show()
   {
     global $db;
@@ -59,6 +60,7 @@ class View
   public function showlinks() {$this->links = true;}
   public function showquestion() {$this->question = true;}
   public function showdel() {$this->del = true;}
+  public function hidetitle() {$this->title = false;}
   private function checkdb()
   {
     if (! $this->db)
@@ -126,9 +128,13 @@ class View
     echo("<ul>");
     while ($row = mysql_fetch_array($qpolls))
     {
-      echo("<li>".$row["title"]);
+      echo("<li>");
+      if ($this->title)
+        echo($row["title"]);
+      if ($this->title && $this->question)
+        echo(":");
       if ($this->question)
-	echo(": <b>".$row["question"]."</b>");
+	echo("<b>".$row["question"]."</b>");
       if ($this->del)
       {
   ?>
@@ -163,7 +169,7 @@ class View
       while ($arow = mysql_fetch_array($pollanswers))
       {
         $code.="\n     <li style=\"color: rgb(55, 90, 158); font-family: Arial,Helvetica,sans-serif; font-size: 10pt;\" styleclass=\"style_polla\">";
-        $code.="\n      <a href=\"".$this->baseurl."vote.php?id=".$arow["id"]."\">".$arow["answer"]."</a>\n     </li>";
+        $code.="\n      <a href=\"".$this->baseurl."vote.php?id=".$arow["id"]."&pid=".$row["id"]."\">".$arow["answer"]."</a>\n     </li>";
       }
       $code.="\n    </ul>\n   </td>\n  </tr>\n </tbody>\n</table>";
     }
