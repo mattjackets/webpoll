@@ -57,7 +57,6 @@ if (isset($_GET["id"]))
 {
   if (!is_numeric($_GET["id"]))
   {
-    echo("<p>fale</p>");
     exit();
   }
   $id = $_GET["id"];
